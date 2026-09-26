@@ -464,44 +464,45 @@ static uint64_t LoadLargestScore(void)
 
 static Color GetPieceColor(int type, int level)
 {
-    unsigned char color1;
-    unsigned char color2;
+    uint8_t index = (uint8_t)level;
 
-    if (level < 138)
+    for (;;)
     {
-        const unsigned char *p =
-            paletteTable[level % 10];
+        uint8_t difference = (uint8_t)(index - 10);
 
-        color1 = p[2];
-        color2 = p[3];
+        if ((int8_t)difference < 0)
+            break;
+
+        index = difference;
     }
-    else
-    {
-        if (level == 146)
-        {
-            color1 = 0x11;
-            color2 = 0x01;
-        }
-        else if (level == 148)
-        {
-            color1 = 0x00;
-            color2 = 0x10;
-        }
-        else
-        {
-            unsigned int seed =
-                (unsigned int)(
-                    level * 1103515245u +
-                    12345u
-                );
 
-            color1 =
-                (unsigned char)((seed >> 8) & 0x3F);
+    uint8_t offset = (uint8_t)(index << 2);
 
-            color2 =
-                (unsigned char)((seed >> 16) & 0x3F);
-        }
-    }
+    static const uint8_t paletteROM[] = {
+        0x0F, 0x30, 0x21, 0x12,
+        0x0F, 0x30, 0x29, 0x1A,
+        0x0F, 0x30, 0x24, 0x14,
+        0x0F, 0x30, 0x2A, 0x12,
+        0x0F, 0x30, 0x2B, 0x15,
+        0x0F, 0x30, 0x22, 0x2B,
+        0x0F, 0x30, 0x00, 0x16,
+        0x0F, 0x30, 0x05, 0x13,
+        0x0F, 0x30, 0x16, 0x12,
+        0x0F, 0x30, 0x27, 0x16,
+        0x60,
+        0xE6, 0x49, 0xA5, 0x49, 0xC9, 0x14,
+        0x30, 0x06, 0xA9, 0x20, 0x85, 0x49,
+        0xE6, 0x89, 0xA5, 0x89, 0xC9, 0x14,
+        0x30, 0x06, 0xA9, 0x20, 0x85, 0x89,
+        0x60,
+        0x00
+    };
+
+    if ((size_t)offset + 3 >= sizeof(paletteROM))
+        offset = (uint8_t)(offset % 40);
+
+    uint8_t color1 = paletteROM[offset + 2];
+    uint8_t color2 = paletteROM[offset + 3];
 
     if (type == 0 || type == 1 || type == 2)
         return GetNESColor(color2);
