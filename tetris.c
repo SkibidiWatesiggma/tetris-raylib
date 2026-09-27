@@ -1146,7 +1146,7 @@ int main(void)
             );
 
             DrawCentered(
-                "NES-STYLE CHAOS",
+                ">:3",
                 205,
                 24,
                 GREEN
